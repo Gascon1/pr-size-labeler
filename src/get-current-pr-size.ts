@@ -1,9 +1,9 @@
 import { octokit } from './octokit';
 import * as github from '@actions/github';
 import { getInput } from '@actions/core';
-import { PrSize } from './get-size-thresholds';
+import { prSizes, Size } from './pr-sizes';
 
-export const getCurrentPrSize = async (prSizes: PrSize[]) => {
+export const getCurrentPrSize = async () => {
   const { data } = await octokit.rest.pulls.listFiles({
     ...github.context.repo,
     pull_number: github.context.issue.number,
@@ -17,5 +17,5 @@ export const getCurrentPrSize = async (prSizes: PrSize[]) => {
     return (acc += file.changes);
   }, 0);
 
-  return prSizes.find((prSize) => lines <= prSize.diff) || prSizes[prSizes.length - 1];
+  return Object.values(prSizes).find(({ diff }) => lines <= diff) || prSizes[Size.XL];
 };

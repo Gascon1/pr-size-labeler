@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { getCurrentPrSize } from './get-current-pr-size';
-import { getPrSizes, Size } from './get-size-thresholds';
+import { prSizes, Size } from './pr-sizes';
 import { octokit } from './octokit';
 
 async function run() {
@@ -11,14 +11,13 @@ async function run() {
       return;
     }
 
-    const prSizes = getPrSizes();
-    const currentPrSize = await getCurrentPrSize(prSizes);
+    const currentPrSize = await getCurrentPrSize();
 
     const existingLabels: string[] = github.context.payload.pull_request.labels.map((label: any) => label.name);
 
     core.info(`Labels found: ${existingLabels.join()}`);
 
-    if (currentPrSize.size === Size.XL) {
+    if (currentPrSize.label === prSizes[Size.XL].label) {
       const messageXl = core.getInput('message_if_xl');
 
       await octokit.rest.issues.createComment({
@@ -36,7 +35,11 @@ async function run() {
       return;
     }
 
-    const labelToRemove = existingLabels.filter((label) => prSizes.map((prSize) => prSize.label).includes(label));
+    const labelToRemove = existingLabels.filter((label) =>
+      Object.values(prSizes)
+        .map((prSize) => prSize.label)
+        .includes(label),
+    );
 
     await octokit.rest.issues.removeLabel({
       ...github.context.repo,

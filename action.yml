@@ -1,4 +1,4 @@
-name: 'Pull Request size labeler'
+name: 'PR size labeler'
 description: 'Label a PR based on the amount of changes'
 
 branding:
@@ -54,11 +54,6 @@ inputs:
     description: 'Label for xl PR'
     required: false
     default: 'size/xl'
-
-  xl_diff:
-    description: 'Max size for a PR to be considered xl'
-    required: false
-    default: '1000'
 
   fail_if_xl:
     description: 'Report GitHub Workflow failure if the PR size is xl allowing to forbid PR merge'
