@@ -13,6 +13,8 @@ async function run() {
 
     const currentPrSize = await getCurrentPrSize();
 
+    core.info(`Current PR size: ${currentPrSize.diff}`);
+
     const existingLabels: string[] = github.context.payload.pull_request.labels.map((label: any) => label.name);
 
     core.info(`Labels found: ${existingLabels.join()}`);
@@ -40,6 +42,8 @@ async function run() {
         .map((prSize) => prSize.label)
         .includes(label),
     );
+
+    core.info(`Label to remove: ${labelToRemove[0]}`);
 
     if (labelToRemove[0]) {
       await octokit.rest.issues.removeLabel({
