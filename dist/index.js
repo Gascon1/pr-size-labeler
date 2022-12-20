@@ -110,6 +110,7 @@ function run() {
                 return;
             }
             const currentPrSize = yield (0, get_current_pr_size_1.getCurrentPrSize)();
+            core.info(`Current PR size: ${currentPrSize.diff}`);
             const existingLabels = github.context.payload.pull_request.labels.map((label) => label.name);
             core.info(`Labels found: ${existingLabels.join()}`);
             if (currentPrSize.label === pr_sizes_1.prSizes[pr_sizes_1.Size.XL].label) {
@@ -125,6 +126,7 @@ function run() {
             const labelToRemove = existingLabels.filter((label) => Object.values(pr_sizes_1.prSizes)
                 .map((prSize) => prSize.label)
                 .includes(label));
+            core.info(`Label to remove: ${labelToRemove[0]}`);
             if (labelToRemove[0]) {
                 yield octokit_1.octokit.rest.issues.removeLabel(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, name: labelToRemove[0] }));
             }
