@@ -41,11 +41,13 @@ async function run() {
         .includes(label),
     );
 
-    await octokit.rest.issues.removeLabel({
-      ...github.context.repo,
-      issue_number: github.context.issue.number,
-      name: labelToRemove[0],
-    });
+    if (labelToRemove[0]) {
+      await octokit.rest.issues.removeLabel({
+        ...github.context.repo,
+        issue_number: github.context.issue.number,
+        name: labelToRemove[0],
+      });
+    }
 
     await octokit.rest.issues.addLabels({
       ...github.context.repo,
