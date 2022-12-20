@@ -1,4 +1,4 @@
-name: 'PR size labeler'
+name: 'PR size labeler (diff)'
 description: 'Label a PR based on the amount of changes'
 
 branding:
