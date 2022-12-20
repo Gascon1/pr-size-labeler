@@ -1,0 +1,39 @@
+{
+  "name": "@gascon1/pr-size-labeler",
+  "version": "1.0.0",
+  "description": "Github action to automatically add a size label on PRs based on line diff and file diff",
+  "main": "lib/index.js",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@octokit/webhooks-types": "^6.8.0",
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.30.0",
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gascon1/pr-size-labeler.git"
+  },
+  "keywords": [
+    "actions",
+    "node",
+    "setup",
+    "pr",
+    "size"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Gascon1/pr-size-labeler/issues"
+  },
+  "homepage": "https://github.com/Gascon1/pr-size-labeler#readme"
+}
