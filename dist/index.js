@@ -1,31 +1,60 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 88:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ 6023:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSizeThresholds = exports.SIZE_ORDER = exports.Size = void 0;
-const core_1 = __nccwpck_require__(2186);
-var Size;
-(function (Size) {
-    Size["XS"] = "xs";
-    Size["S"] = "s";
-    Size["M"] = "m";
-    Size["L"] = "l";
-    Size["XL"] = "xl";
-})(Size = exports.Size || (exports.Size = {}));
-exports.SIZE_ORDER = [Size.XS, Size.S, Size.M, Size.L, Size.XL];
-const getSizeThresholds = () => {
-    return exports.SIZE_ORDER.map((size) => ({
-        size,
-        diff: parseInt((0, core_1.getInput)(`${size}_diff`), 10),
-        label: (0, core_1.getInput)(`${size}_label`),
-    }));
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
-exports.getSizeThresholds = getSizeThresholds;
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getCurrentPrSize = void 0;
+const octokit_1 = __nccwpck_require__(3258);
+const github = __importStar(__nccwpck_require__(5438));
+const core_1 = __nccwpck_require__(2186);
+const pr_sizes_1 = __nccwpck_require__(9038);
+const getCurrentPrSize = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { data } = yield octokit_1.octokit.rest.pulls.listFiles(Object.assign(Object.assign({}, github.context.repo), { pull_number: github.context.issue.number }));
+    const lines = data.reduce((acc, file) => {
+        if (file.filename.match((0, core_1.getInput)('excluded_files'))) {
+            return acc;
+        }
+        return (acc += file.changes);
+    }, 0);
+    return Object.values(pr_sizes_1.prSizes).find(({ diff }) => lines <= diff) || pr_sizes_1.prSizes[pr_sizes_1.Size.XL];
+});
+exports.getCurrentPrSize = getCurrentPrSize;
 
 
 /***/ }),
@@ -70,9 +99,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const config_1 = __nccwpck_require__(88);
-// regex to ignore all jest test files, with extensions .js, .jsx, .ts, .tsx
-const ignoreRegex = /(\.test|\.spec)\.(js|jsx|ts|tsx)$/;
+const get_current_pr_size_1 = __nccwpck_require__(6023);
+const pr_sizes_1 = __nccwpck_require__(9038);
+const octokit_1 = __nccwpck_require__(3258);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -80,28 +109,26 @@ function run() {
                 core.info('Event is not pull request, exiting');
                 return;
             }
-            const octokit = github.getOctokit(core.getInput('GITHUB_TOKEN'));
-            const { data } = yield octokit.rest.pulls.listFiles(Object.assign(Object.assign({}, github.context.repo), { pull_number: github.context.issue.number }));
-            const lines = data.reduce((acc, file) => {
-                if (file.filename.match(core.getInput('excluded_files'))) {
-                    return acc;
-                }
-                return (acc += file.changes);
-            }, 0);
-            const sizeThresholds = (0, config_1.getSizeThresholds)();
-            const currentPrSize = sizeThresholds.find((threshold) => lines <= threshold.diff) || sizeThresholds[sizeThresholds.length - 1];
+            const currentPrSize = yield (0, get_current_pr_size_1.getCurrentPrSize)();
             const existingLabels = github.context.payload.pull_request.labels.map((label) => label.name);
             core.info(`Labels found: ${existingLabels.join()}`);
-            if (currentPrSize.size === config_1.Size.XL) {
-                yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, body: core.getInput('message_if_xl') }));
-                core.setFailed(core.getInput('message_if_xl'));
+            if (currentPrSize.label === pr_sizes_1.prSizes[pr_sizes_1.Size.XL].label) {
+                const messageXl = core.getInput('message_if_xl');
+                yield octokit_1.octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, body: messageXl }));
+                if (core.getInput('fail_if_xl')) {
+                    core.setFailed(messageXl);
+                }
             }
             if (existingLabels.includes(core.getInput(currentPrSize.label))) {
                 return;
             }
-            const labelToRemove = existingLabels.filter((label) => sizeThresholds.map((threshold) => threshold.label).includes(label));
-            yield octokit.rest.issues.removeLabel(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, name: labelToRemove[0] }));
-            yield octokit.rest.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, labels: [currentPrSize.label] }));
+            const labelToRemove = existingLabels.filter((label) => Object.values(pr_sizes_1.prSizes)
+                .map((prSize) => prSize.label)
+                .includes(label));
+            if (labelToRemove[0]) {
+                yield octokit_1.octokit.rest.issues.removeLabel(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, name: labelToRemove[0] }));
+            }
+            yield octokit_1.octokit.rest.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, labels: [currentPrSize.label] }));
         }
         catch (err) {
             const error = err;
@@ -110,6 +137,85 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 3258:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.octokit = void 0;
+const core_1 = __nccwpck_require__(2186);
+const github = __importStar(__nccwpck_require__(5438));
+exports.octokit = github.getOctokit((0, core_1.getInput)('GITHUB_TOKEN'));
+
+
+/***/ }),
+
+/***/ 9038:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.prSizes = exports.Size = void 0;
+const core_1 = __nccwpck_require__(2186);
+var Size;
+(function (Size) {
+    Size["XS"] = "xs";
+    Size["S"] = "s";
+    Size["M"] = "m";
+    Size["L"] = "l";
+    Size["XL"] = "xl";
+})(Size = exports.Size || (exports.Size = {}));
+exports.prSizes = {
+    [Size.XS]: {
+        diff: parseInt((0, core_1.getInput)('xs_diff'), 10),
+        label: (0, core_1.getInput)('xs_label'),
+    },
+    [Size.S]: {
+        diff: parseInt((0, core_1.getInput)('s_diff'), 10),
+        label: (0, core_1.getInput)('s_label'),
+    },
+    [Size.M]: {
+        diff: parseInt((0, core_1.getInput)('m_diff'), 10),
+        label: (0, core_1.getInput)('m_label'),
+    },
+    [Size.L]: {
+        diff: parseInt((0, core_1.getInput)('l_diff'), 10),
+        label: (0, core_1.getInput)('l_label'),
+    },
+    [Size.XL]: {
+        diff: parseInt((0, core_1.getInput)('xl_diff'), 10),
+        label: (0, core_1.getInput)('xl_label'),
+    },
+};
 
 
 /***/ }),
