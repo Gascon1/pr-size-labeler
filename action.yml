@@ -1,0 +1,82 @@
+name: 'Pull Request size labeler'
+description: 'Label a PR based on the amount of changes'
+
+branding:
+  icon: 'tag'
+  color: 'green'
+
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub token'
+    required: true
+
+  xs_label:
+    description: 'Label for xs PR'
+    required: false
+    default: 'size/xs'
+
+  xs_diff:
+    description: 'Max size for a PR to be considered xs'
+    required: false
+    default: '10'
+
+  s_label:
+    description: 'Label for s PR'
+    required: false
+    default: 'size/s'
+
+  s_diff:
+    description: 'Max size for a PR to be considered s'
+    required: false
+    default: '50'
+
+  m_label:
+    description: 'Label for m PR'
+    required: false
+    default: 'size/m'
+
+  m_diff:
+    description: 'Max size for a PR to be considered m'
+    required: false
+    default: '250'
+
+  l_label:
+    description: 'Label for l PR'
+    required: false
+    default: 'size/l'
+
+  l_diff:
+    description: 'Max size for a PR to be considered l'
+    required: false
+    default: '500'
+
+  xl_label:
+    description: 'Label for xl PR'
+    required: false
+    default: 'size/xl'
+
+  xl_diff:
+    description: 'Max size for a PR to be considered xl'
+    required: false
+    default: '1000'
+
+  fail_if_xl:
+    description: 'Report GitHub Workflow failure if the PR size is xl allowing to forbid PR merge'
+    required: false
+    default: 'false'
+
+  message_if_xl:
+    description: 'Message to show if the PR size is xl'
+    required: false
+    default: >
+      This PR exceeds the recommended size.
+      Please make sure you are NOT addressing multiple issues with one PR.
+      Note this PR might be rejected due to its size.
+
+  excluded_files:
+    description: 'Regex to ignore files from the line diff count (e.g. /(\.test|\.spec)\.(js|jsx|ts|tsx)$/)'
+    required: false
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
