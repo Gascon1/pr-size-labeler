@@ -52,6 +52,7 @@ const getCurrentPrSize = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         return (acc += file.changes);
     }, 0);
+    (0, core_1.info)(`Lines changed: ${lines}`);
     return Object.values(pr_sizes_1.prSizes).find(({ diff }) => lines <= diff) || pr_sizes_1.prSizes[pr_sizes_1.Size.XL];
 });
 exports.getCurrentPrSize = getCurrentPrSize;
@@ -110,7 +111,7 @@ function run() {
                 return;
             }
             const currentPrSize = yield (0, get_current_pr_size_1.getCurrentPrSize)();
-            core.info(`Current PR size: ${currentPrSize.diff}`);
+            core.info(`Current PR size: ${currentPrSize.label}`);
             const existingLabels = github.context.payload.pull_request.labels.map((label) => label.name);
             core.info(`Labels found: ${existingLabels.join()}`);
             if (currentPrSize.label === pr_sizes_1.prSizes[pr_sizes_1.Size.XL].label) {
@@ -214,7 +215,7 @@ exports.prSizes = {
         label: (0, core_1.getInput)('l_label'),
     },
     [Size.XL]: {
-        diff: parseInt((0, core_1.getInput)('xl_diff'), 10),
+        diff: Number.MAX_SAFE_INTEGER,
         label: (0, core_1.getInput)('xl_label'),
     },
 };
