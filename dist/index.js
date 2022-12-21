@@ -121,7 +121,7 @@ function run() {
                     core.setFailed(messageXl);
                 }
             }
-            if (existingLabels.includes(core.getInput(currentPrSize.label))) {
+            if (existingLabels.includes(currentPrSize.label)) {
                 return;
             }
             const labelToRemove = existingLabels.filter((label) => Object.values(pr_sizes_1.prSizes)

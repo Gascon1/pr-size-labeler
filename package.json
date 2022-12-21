@@ -24,6 +24,7 @@
   "scripts": {
     "build": "tsc",
     "package": "ncc build --source-map --license licenses.txt",
+    "release": "npm run build && npm run package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
