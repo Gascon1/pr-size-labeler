@@ -26,7 +26,7 @@ export const prSizes = {
     label: getInput('l_label'),
   },
   [Size.XL]: {
-    diff: parseInt(getInput('xl_diff'), 10),
+    diff: Number.MAX_SAFE_INTEGER,
     label: getInput('xl_label'),
   },
 };

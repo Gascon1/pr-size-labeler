@@ -1,6 +1,6 @@
 import { octokit } from './octokit';
 import * as github from '@actions/github';
-import { getInput } from '@actions/core';
+import { getInput, info } from '@actions/core';
 import { prSizes, Size } from './pr-sizes';
 
 export const getCurrentPrSize = async () => {
@@ -16,6 +16,8 @@ export const getCurrentPrSize = async () => {
 
     return (acc += file.changes);
   }, 0);
+
+  info(`Lines changed: ${lines}`);
 
   return Object.values(prSizes).find(({ diff }) => lines <= diff) || prSizes[Size.XL];
 };

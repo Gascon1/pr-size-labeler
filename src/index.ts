@@ -13,7 +13,7 @@ async function run() {
 
     const currentPrSize = await getCurrentPrSize();
 
-    core.info(`Current PR size: ${currentPrSize.diff}`);
+    core.info(`Current PR size: ${currentPrSize.label}`);
 
     const existingLabels: string[] = github.context.payload.pull_request.labels.map((label: any) => label.name);
 
