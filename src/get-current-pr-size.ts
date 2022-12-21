@@ -9,12 +9,14 @@ export const getCurrentPrSize = async () => {
     pull_number: github.context.issue.number,
   });
 
+  const excludedFiles = getInput('excluded_files');
+
   const lines = data.reduce((acc, file) => {
-    if (file.filename.match(getInput('excluded_files'))) {
+    if (excludedFiles && file.filename.match(excludedFiles)) {
       return acc;
     }
 
-    return (acc += file.changes);
+    return acc + file.changes;
   }, 0);
 
   info(`Lines changed: ${lines}`);
