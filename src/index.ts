@@ -33,7 +33,7 @@ async function run() {
       }
     }
 
-    if (existingLabels.includes(core.getInput(currentPrSize.label))) {
+    if (existingLabels.includes(currentPrSize.label)) {
       return;
     }
 
