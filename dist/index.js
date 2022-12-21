@@ -46,11 +46,12 @@ const core_1 = __nccwpck_require__(2186);
 const pr_sizes_1 = __nccwpck_require__(9038);
 const getCurrentPrSize = () => __awaiter(void 0, void 0, void 0, function* () {
     const { data } = yield octokit_1.octokit.rest.pulls.listFiles(Object.assign(Object.assign({}, github.context.repo), { pull_number: github.context.issue.number }));
+    const excludedFiles = (0, core_1.getInput)('excluded_files');
     const lines = data.reduce((acc, file) => {
-        if (file.filename.match((0, core_1.getInput)('excluded_files'))) {
+        if (excludedFiles && file.filename.match(excludedFiles)) {
             return acc;
         }
-        return (acc += file.changes);
+        return acc + file.changes;
     }, 0);
     (0, core_1.info)(`Lines changed: ${lines}`);
     return Object.values(pr_sizes_1.prSizes).find(({ diff }) => lines <= diff) || pr_sizes_1.prSizes[pr_sizes_1.Size.XL];
