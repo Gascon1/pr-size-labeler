@@ -21,5 +21,7 @@ export const getCurrentPrSize = async () => {
 
   info(`Lines changed: ${lines}`);
 
+  const prSizes = getPrSizeInputs();
+
   return Object.values(prSizes).find(({ diff }) => lines <= diff) || prSizes[Size.XL];
 };
