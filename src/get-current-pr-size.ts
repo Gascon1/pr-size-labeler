@@ -1,7 +1,7 @@
 import { octokit } from './octokit';
 import * as github from '@actions/github';
-import { getInput, info } from '@actions/core';
-import { prSizes, Size } from './pr-sizes';
+import { getMultilineInput, info } from '@actions/core';
+import { getPrSizeInputs, Size } from './pr-sizes';
 
 export const getCurrentPrSize = async () => {
   const { data } = await octokit.rest.pulls.listFiles({
@@ -9,10 +9,10 @@ export const getCurrentPrSize = async () => {
     pull_number: github.context.issue.number,
   });
 
-  const excludedFiles = getInput('excluded_files');
+  const excludedPatterns = getMultilineInput('excluded_files');
 
   const lines = data.reduce((acc, file) => {
-    if (excludedFiles && file.filename.match(excludedFiles)) {
+    if (excludedPatterns && excludedPatterns.some((pattern) => file.filename.match(pattern))) {
       return acc;
     }
 
