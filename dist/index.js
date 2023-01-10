@@ -46,15 +46,16 @@ const core_1 = __nccwpck_require__(2186);
 const pr_sizes_1 = __nccwpck_require__(9038);
 const getCurrentPrSize = () => __awaiter(void 0, void 0, void 0, function* () {
     const { data } = yield octokit_1.octokit.rest.pulls.listFiles(Object.assign(Object.assign({}, github.context.repo), { pull_number: github.context.issue.number }));
-    const excludedFiles = (0, core_1.getInput)('excluded_files');
+    const excludedPatterns = (0, core_1.getMultilineInput)('excluded_files');
     const lines = data.reduce((acc, file) => {
-        if (excludedFiles && file.filename.match(excludedFiles)) {
+        if (excludedPatterns && excludedPatterns.some((pattern) => file.filename.match(pattern.trim()))) {
             return acc;
         }
         return acc + file.changes;
     }, 0);
     (0, core_1.info)(`Lines changed: ${lines}`);
-    return Object.values(pr_sizes_1.prSizes).find(({ diff }) => lines <= diff) || pr_sizes_1.prSizes[pr_sizes_1.Size.XL];
+    const prSizes = (0, pr_sizes_1.getPrSizeInputs)();
+    return Object.values(prSizes).find(({ diff }) => lines <= diff) || prSizes[pr_sizes_1.Size.XL];
 });
 exports.getCurrentPrSize = getCurrentPrSize;
 
@@ -111,11 +112,12 @@ function run() {
                 core.info('Event is not pull request, exiting');
                 return;
             }
+            const prSizes = (0, pr_sizes_1.getPrSizeInputs)();
             const currentPrSize = yield (0, get_current_pr_size_1.getCurrentPrSize)();
             core.info(`Current PR size: ${currentPrSize.label}`);
             const existingLabels = github.context.payload.pull_request.labels.map((label) => label.name);
             core.info(`Labels found: ${existingLabels.join()}`);
-            if (currentPrSize.label === pr_sizes_1.prSizes[pr_sizes_1.Size.XL].label) {
+            if (currentPrSize.label === prSizes[pr_sizes_1.Size.XL].label) {
                 const messageXl = core.getInput('message_if_xl');
                 yield octokit_1.octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: github.context.issue.number, body: messageXl }));
                 if (core.getInput('fail_if_xl')) {
@@ -125,7 +127,7 @@ function run() {
             if (existingLabels.includes(currentPrSize.label)) {
                 return;
             }
-            const labelToRemove = existingLabels.filter((label) => Object.values(pr_sizes_1.prSizes)
+            const labelToRemove = existingLabels.filter((label) => Object.values(prSizes)
                 .map((prSize) => prSize.label)
                 .includes(label));
             core.info(`Label to remove: ${labelToRemove[0]}`);
@@ -188,7 +190,7 @@ exports.octokit = github.getOctokit((0, core_1.getInput)('GITHUB_TOKEN'));
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.prSizes = exports.Size = void 0;
+exports.getPrSizeInputs = exports.Size = void 0;
 const core_1 = __nccwpck_require__(2186);
 var Size;
 (function (Size) {
@@ -198,28 +200,31 @@ var Size;
     Size["L"] = "l";
     Size["XL"] = "xl";
 })(Size = exports.Size || (exports.Size = {}));
-exports.prSizes = {
-    [Size.XS]: {
-        diff: parseInt((0, core_1.getInput)('xs_diff'), 10),
-        label: (0, core_1.getInput)('xs_label'),
-    },
-    [Size.S]: {
-        diff: parseInt((0, core_1.getInput)('s_diff'), 10),
-        label: (0, core_1.getInput)('s_label'),
-    },
-    [Size.M]: {
-        diff: parseInt((0, core_1.getInput)('m_diff'), 10),
-        label: (0, core_1.getInput)('m_label'),
-    },
-    [Size.L]: {
-        diff: parseInt((0, core_1.getInput)('l_diff'), 10),
-        label: (0, core_1.getInput)('l_label'),
-    },
-    [Size.XL]: {
-        diff: Number.MAX_SAFE_INTEGER,
-        label: (0, core_1.getInput)('xl_label'),
-    },
+const getPrSizeInputs = () => {
+    return {
+        [Size.XS]: {
+            diff: parseInt((0, core_1.getInput)('xs_diff'), 10),
+            label: (0, core_1.getInput)('xs_label'),
+        },
+        [Size.S]: {
+            diff: parseInt((0, core_1.getInput)('s_diff'), 10),
+            label: (0, core_1.getInput)('s_label'),
+        },
+        [Size.M]: {
+            diff: parseInt((0, core_1.getInput)('m_diff'), 10),
+            label: (0, core_1.getInput)('m_label'),
+        },
+        [Size.L]: {
+            diff: parseInt((0, core_1.getInput)('l_diff'), 10),
+            label: (0, core_1.getInput)('l_label'),
+        },
+        [Size.XL]: {
+            diff: Number.MAX_SAFE_INTEGER,
+            label: (0, core_1.getInput)('xl_label'),
+        },
+    };
 };
+exports.getPrSizeInputs = getPrSizeInputs;
 
 
 /***/ }),
