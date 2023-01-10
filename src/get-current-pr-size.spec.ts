@@ -10,6 +10,13 @@ jest.mock('@actions/github', () => {
 jest.mock('@actions/core');
 jest.mock('./pr-sizes');
 jest.mock('./octokit', () => {
+  const fileBaseInfo = {
+    sha: 'sha',
+    blob_url: 'blob_url',
+    raw_url: 'raw_url',
+    contents_url: 'content_url',
+  };
+
   const listFiles = jest.fn().mockResolvedValue({
     headers: {},
     status: 200,
@@ -25,13 +32,6 @@ jest.mock('./octokit', () => {
     octokit: { rest: { pulls: { listFiles } } },
   };
 });
-
-const fileBaseInfo = {
-  sha: 'sha',
-  blob_url: 'blob_url',
-  raw_url: 'raw_url',
-  contents_url: 'content_url',
-};
 
 describe('getCurrentPrSize', () => {
   let prSize: {

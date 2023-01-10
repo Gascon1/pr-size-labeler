@@ -16,14 +16,12 @@ module.exports = {
     testPathIgnorePatterns: ["<rootDir>/node_modules/"],
     testEnvironment: "node",
     transform: {
-      // Use babel-jest to transpile tests with the next/babel preset
-      // https://jestjs.io/docs/configuration#transform-objectstring-pathtotransformer--pathtotransformer-object
-      "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest" ],
+      '^.+\\.ts$': 'ts-jest'
     },
+    moduleFileExtensions: ['js', 'ts'],
     transformIgnorePatterns: [
       "/node_modules/",
       "^.+\\.module\\.(css|sass|scss)$",
     ],
   };
-  
   
