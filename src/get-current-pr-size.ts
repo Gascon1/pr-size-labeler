@@ -12,7 +12,7 @@ export const getCurrentPrSize = async () => {
   const excludedPatterns = getMultilineInput('excluded_files');
 
   const lines = data.reduce((acc, file) => {
-    if (excludedPatterns && excludedPatterns.some((pattern) => file.filename.match(pattern))) {
+    if (excludedPatterns && excludedPatterns.some((pattern) => file.filename.match(pattern.trim()))) {
       return acc;
     }
 
