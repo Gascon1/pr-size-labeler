@@ -37,7 +37,7 @@ jobs:
             This PR exceeds the recommended size of 1000 lines.
             Please make sure you are NOT addressing multiple issues with one PR.
             Note this PR might be rejected due to its size.
-          excluded_files: ''
+          excluded_files: []
 ```
 
 ## 🎛️ Available parameters
@@ -46,7 +46,14 @@ jobs:
 - `*_diff` (`xs_max_size`, `s_max_size`…): Adjust which amount of changes you consider appropriate for each size based on your project context
 - `fail_if_xl`: Set to `'true'` will report GitHub Workflow failure if the PR size is xl allowing to forbid PR merge
 - `message_if_xl`: Let the user(s) know that the PR exceeds the recommended size and what the consequences are
-- `excluded_files`: Regex to ignore files from the line diff count (e.g. `/(\.test|\.spec)\.(js|jsx|ts|tsx)$/`)
+- `excluded_files`: Regex to ignore files from the line diff count (e.g. `/(\.test|\.spec)\.(js|jsx|ts|tsx)$/`). You can use multiple line input to specify multiple file patterns. For example:
+
+```
+          excluded_files: >
+            /(\.test|\.spec)\.(js|jsx|ts|tsx)$/
+            /package-lock.json$/
+
+```
 
 ## 🤔 Basic concepts or assumptions
 

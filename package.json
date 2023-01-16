@@ -11,6 +11,7 @@
     "typescript": "^4.9.4"
   },
   "devDependencies": {
+    "@types/jest": "29.2.5",
     "@vercel/ncc": "^0.36.0",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "8.5.0",
@@ -19,13 +20,14 @@
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-prettier": "4.2.1",
     "prettier": "^2.8.1",
+    "ts-jest": "29.0.3",
     "typescript": "^4.9.4"
   },
   "scripts": {
     "build": "tsc",
     "package": "ncc build --source-map --license licenses.txt",
     "release": "npm run build && npm run package",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

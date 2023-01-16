@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { getCurrentPrSize } from './get-current-pr-size';
-import { prSizes, Size } from './pr-sizes';
+import { getPrSizeInputs, Size } from './pr-sizes';
 import { octokit } from './octokit';
 
 async function run() {
@@ -10,6 +10,8 @@ async function run() {
       core.info('Event is not pull request, exiting');
       return;
     }
+
+    const prSizes = getPrSizeInputs();
 
     const currentPrSize = await getCurrentPrSize();
 
